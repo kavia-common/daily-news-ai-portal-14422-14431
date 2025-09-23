@@ -5,15 +5,13 @@
 import React from "react";
 import { markets } from "../../data/mockData";
 import "./widget.css";
-import { useTranslation } from "react-i18next";
 
 // PUBLIC_INTERFACE
 export default function MarketsWidget() {
-  const { t } = useTranslation();
   return (
     <div className="widget card shadow-card">
       <div className="widget-header">
-        <span className="badge">{t("markets")}</span>
+        <span className="badge">Markets</span>
       </div>
       <div className="widget-body">
         <div className="market-section">

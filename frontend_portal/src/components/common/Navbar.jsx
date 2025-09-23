@@ -2,19 +2,13 @@
  * Sticky navigation navbar with categories and dropdown subcategories.
  */
 // PUBLIC_INTERFACE
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { categories } from "../../data/mockData";
 import "./navbar.css";
-import { LanguageContext } from "../../context/LanguageContext";
-import { useTranslation } from "react-i18next";
 
 // PUBLIC_INTERFACE
 export default function Navbar() {
   const [openIdx, setOpenIdx] = useState(null);
-  const { lang } = useContext(LanguageContext);
-  const { t } = useTranslation();
-
-  const catLabel = (c) => (c.i18n?.[lang] ?? c.name);
 
   return (
     <nav className="gx-navbar">
@@ -27,7 +21,7 @@ export default function Navbar() {
               onMouseEnter={() => setOpenIdx(idx)}
               onMouseLeave={() => setOpenIdx(null)}
             >
-              <button className="nav-link">{catLabel(c)}</button>
+              <button className="nav-link">{c.name}</button>
               {openIdx === idx && c.sub?.length > 0 && (
                 <div className="dropdown">
                   {c.sub.map((s) => (
@@ -41,7 +35,7 @@ export default function Navbar() {
           ))}
         </ul>
         <div className="nav-cta">
-          <span className="badge">{t("subscribe")}</span>
+          <span className="badge">Subscribe</span>
         </div>
       </div>
     </nav>

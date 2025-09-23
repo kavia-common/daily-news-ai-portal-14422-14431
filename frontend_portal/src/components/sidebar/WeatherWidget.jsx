@@ -4,15 +4,13 @@
 // PUBLIC_INTERFACE
 import React from "react";
 import "./widget.css";
-import { useTranslation } from "../../react-i18next-shim";
 
 // PUBLIC_INTERFACE
 export default function WeatherWidget() {
-  const { t } = useTranslation();
   return (
     <div className="widget card shadow-card">
       <div className="widget-header">
-        <span className="badge">{t("weather")}</span>
+        <span className="badge">Weather</span>
       </div>
       <div className="widget-body">
         <div className="weather">

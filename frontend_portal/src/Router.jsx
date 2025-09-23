@@ -13,9 +13,6 @@ import ArticlePage from "./pages/ArticlePage";
 import PhotosPage from "./pages/multimedia/PhotosPage";
 import VideosPage from "./pages/multimedia/VideosPage";
 import PodcastsPage from "./pages/multimedia/PodcastsPage";
-import ProfilePage from "./pages/ProfilePage";
-import CategoriesPage from "./pages/CategoriesPage";
-import SavedPage from "./pages/SavedPage";
 
 // PUBLIC_INTERFACE
 export default function AppRouter() {
@@ -30,9 +27,6 @@ export default function AppRouter() {
         <Route path="/photos" element={<PhotosPage />} />
         <Route path="/videos" element={<VideosPage />} />
         <Route path="/podcasts" element={<PodcastsPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/categories" element={<CategoriesPage />} />
-        <Route path="/saved" element={<SavedPage />} />
       </Routes>
       <Footer />
     </BrowserRouter>
