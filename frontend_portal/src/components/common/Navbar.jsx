@@ -6,7 +6,7 @@ import React, { useContext, useState } from "react";
 import { categories } from "../../data/mockData";
 import "./navbar.css";
 import { LanguageContext } from "../../context/LanguageContext";
-import { useTranslation } from "../../react-i18next-shim";
+import { useTranslation } from "../../react-i18next-shim.js";
 
 // PUBLIC_INTERFACE
 export default function Navbar() {
