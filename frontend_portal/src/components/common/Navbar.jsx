@@ -5,10 +5,12 @@
 import React, { useState } from "react";
 import { categories } from "../../data/mockData";
 import "./navbar.css";
+import { useTranslation } from "../../react-i18next-shim.js";
 
 // PUBLIC_INTERFACE
 export default function Navbar() {
   const [openIdx, setOpenIdx] = useState(null);
+  const { t } = useTranslation();
 
   return (
     <nav className="gx-navbar">
