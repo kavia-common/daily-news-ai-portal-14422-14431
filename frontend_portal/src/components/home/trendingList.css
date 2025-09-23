@@ -1,0 +1,13 @@
+.trending { padding: 14px; }
+.trending .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.items { margin: 0; padding: 0; }
+.item + .item { border-top: 1px solid var(--c-gray-200); }
+.link {
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
+  gap: 10px; align-items: center;
+  padding: 12px 6px;
+}
+.index { font-weight: 800; color: var(--c-red); }
+.title { font-weight: 600; }
+.reads { color: var(--c-gray-600); font-size: 13px; }

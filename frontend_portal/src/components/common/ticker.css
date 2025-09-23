@@ -1,0 +1,33 @@
+.gx-ticker {
+  position: sticky;
+  top: calc(var(--header-h) + var(--navbar-h));
+  z-index: var(--z-ticker);
+  background: var(--c-red);
+  color: var(--c-white);
+  height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.ticker-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.label {
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  border: 1px solid rgba(255,255,255,0.5);
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+.headline {
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

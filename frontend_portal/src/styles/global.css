@@ -1,0 +1,191 @@
+/* Global styles for GLOBAL EXPRESS portal */
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: local('Inter'), local('Inter var');
+  /* In production, load from CDN or local assets */
+}
+
+@font-face {
+  font-family: 'Merriweather';
+  font-style: normal;
+  font-weight: 300 900;
+  font-display: swap;
+  src: local('Merriweather');
+}
+
+/* Color variables */
+:root {
+  --c-black: #0B0C0E;
+  --c-white: #FFFFFF;
+  --c-red: #D21F3C;
+  --c-gray-100: #F7F7F8;
+  --c-gray-200: #EDEEF0;
+  --c-gray-300: #D9DADF;
+  --c-gray-400: #A1A5AD;
+  --c-gray-500: #707580;
+  --c-gray-600: #4B4F58;
+  --c-gray-700: #32353C;
+
+  --ocean-primary: #2563EB;
+  --ocean-amber: #F59E0B;
+  --ocean-error: #EF4444;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 10px rgba(0,0,0,0.08);
+  --shadow-lg: 0 10px 20px rgba(0,0,0,0.10);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+
+  --max-w: 1200px;
+  --gutter: 20px;
+  --header-h: 72px;
+  --navbar-h: 48px;
+
+  --z-header: 1000;
+  --z-navbar: 900;
+  --z-ticker: 1100;
+  --z-modal: 2000;
+}
+
+/* Reset and base */
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  background: var(--c-white);
+  color: var(--c-black);
+  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+img { max-width: 100%; height: auto; display: block; }
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; padding: 0; margin: 0; }
+button { font: inherit; }
+
+/* Containers */
+.container {
+  width: 100%;
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+/* Headline typography */
+.h1, h1 {
+  font-family: 'Merriweather', Georgia, 'Times New Roman', serif;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+.h2, h2 {
+  font-family: 'Merriweather', Georgia, 'Times New Roman', serif;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.h3, h3 {
+  font-family: 'Merriweather', Georgia, 'Times New Roman', serif;
+  font-weight: 700;
+}
+
+/* Utilities */
+.badge {
+  display: inline-block;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--c-red);
+  color: var(--c-white);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.shadow-card {
+  box-shadow: var(--shadow-sm);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.shadow-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.card {
+  background: var(--c-white);
+  border: 1px solid var(--c-gray-200);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+/* Grid helpers */
+.grid {
+  display: grid;
+  gap: 20px;
+}
+.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+@media (max-width: 1024px) {
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+  .grid-3, .grid-2 { grid-template-columns: 1fr; }
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--c-gray-200);
+  background: var(--c-white);
+  color: var(--c-black);
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease, transform .1s ease;
+}
+.btn:hover { background: var(--c-gray-100); }
+.btn:active { transform: translateY(1px); }
+.btn-primary {
+  background: var(--c-red);
+  color: var(--c-white);
+  border-color: var(--c-red);
+}
+.btn-primary:hover {
+  opacity: 0.95;
+}
+
+/* Inputs */
+.input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--c-gray-300);
+  border-radius: 10px;
+  background: var(--c-white);
+  color: var(--c-black);
+}
+.input:focus {
+  outline: 2px solid var(--c-black);
+  outline-offset: 1px;
+}
+
+/* Sticky bars space fix */
+.page-offset {
+  padding-top: calc(var(--header-h) + var(--navbar-h) + 44px); /* accounts for ticker height as well */
+}
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: var(--c-gray-200);
+  width: 100%;
+}

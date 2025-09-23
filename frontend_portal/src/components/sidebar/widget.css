@@ -1,0 +1,17 @@
+.widget { padding: 14px; }
+.widget-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.widget-body { font-size: 14px; color: var(--c-gray-700); }
+.weather { display: flex; align-items: center; gap: 12px; }
+.weather .temp { font-size: 40px; font-weight: 900; line-height: 1; }
+.forecast { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
+.day { text-align: center; background: var(--c-gray-100); border-radius: 10px; padding: 6px; }
+
+.market-section .row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 0;
+}
+.change.up { color: #15803d; } /* greenish */
+.change.down { color: var(--ocean-error); }
+
+.poll-option { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+.newsletter-form { display: flex; gap: 8px; }
