@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { LanguageContext } from "../context/LanguageContext";
-import { useTranslation } from "../react-i18next-shim";
+import { useTranslation } from "react-i18next";
 
 /**
  * Profile/Settings page with language selector and scaffolds

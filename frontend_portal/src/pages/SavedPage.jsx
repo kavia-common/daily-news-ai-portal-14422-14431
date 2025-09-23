@@ -1,5 +1,5 @@
 import React from "react";
-import { useTranslation } from "../react-i18next-shim";
+import { useTranslation } from "react-i18next";
 
 export default function SavedPage() {
   const { t } = useTranslation();

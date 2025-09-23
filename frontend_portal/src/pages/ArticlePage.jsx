@@ -6,7 +6,7 @@ import React, { useContext } from "react";
 import { useParams } from "react-router-dom";
 import { articles } from "../data/mockData";
 import "./article.css";
-import { useTranslation } from "../react-i18next-shim";
+import { useTranslation } from "react-i18next";
 import { LanguageContext } from "../context/LanguageContext";
 
 // PUBLIC_INTERFACE

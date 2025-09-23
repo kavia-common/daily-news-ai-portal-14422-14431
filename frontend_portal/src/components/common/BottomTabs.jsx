@@ -1,7 +1,7 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import "./bottomTabs.css";
-import { useTranslation } from "../../react-i18next-shim";
+import { useTranslation } from "react-i18next";
 
 /**
  * Bottom tab bar for mobile-first UX

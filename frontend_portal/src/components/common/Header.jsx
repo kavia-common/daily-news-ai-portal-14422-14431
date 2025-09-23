@@ -5,7 +5,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import "./header.css";
 import { LanguageContext } from "../../context/LanguageContext";
-import { useTranslation } from "../../react-i18next-shim";
+import { useTranslation } from "react-i18next";
 
 function useClock() {
   const [now, setNow] = useState(new Date());

@@ -5,7 +5,7 @@
 import React from "react";
 import { multimedia } from "../../data/mockData";
 import "./media.css";
-import { useTranslation } from "../../react-i18next-shim.js";
+import { useTranslation } from "react-i18next";
 
 // PUBLIC_INTERFACE
 export default function PodcastsPage() {
