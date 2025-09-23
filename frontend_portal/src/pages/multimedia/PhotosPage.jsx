@@ -5,7 +5,7 @@
 import React from "react";
 import { multimedia } from "../../data/mockData";
 import "./media.css";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "../../react-i18next-shim";
 
 // PUBLIC_INTERFACE
 export default function PhotosPage() {

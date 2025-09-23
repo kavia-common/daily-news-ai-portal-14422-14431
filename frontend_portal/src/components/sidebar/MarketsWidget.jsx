@@ -5,7 +5,7 @@
 import React from "react";
 import { markets } from "../../data/mockData";
 import "./widget.css";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "../../react-i18next-shim";
 
 // PUBLIC_INTERFACE
 export default function MarketsWidget() {

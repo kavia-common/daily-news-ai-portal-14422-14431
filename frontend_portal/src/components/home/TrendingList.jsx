@@ -5,7 +5,7 @@
 import React, { useContext } from "react";
 import { trending } from "../../data/mockData";
 import "./trendingList.css";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "../../react-i18next-shim";
 import { LanguageContext } from "../../context/LanguageContext";
 
 // PUBLIC_INTERFACE

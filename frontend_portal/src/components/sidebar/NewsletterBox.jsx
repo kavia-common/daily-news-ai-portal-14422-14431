@@ -4,7 +4,7 @@
 // PUBLIC_INTERFACE
 import React from "react";
 import "./widget.css";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "../../react-i18next-shim";
 
 // PUBLIC_INTERFACE
 export default function NewsletterBox() {
