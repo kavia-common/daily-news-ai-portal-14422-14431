@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { LanguageContext } from "../../context/LanguageContext";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "../../react-i18next-shim";
 import "./onboarding.css";
 
 /**

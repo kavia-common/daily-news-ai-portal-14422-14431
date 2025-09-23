@@ -6,7 +6,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { breakingNews } from "../../data/mockData";
 import "./ticker.css";
 import { LanguageContext } from "../../context/LanguageContext";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "../../react-i18next-shim";
 
 // PUBLIC_INTERFACE
 export default function Ticker() {
