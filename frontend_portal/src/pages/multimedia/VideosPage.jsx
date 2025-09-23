@@ -5,13 +5,15 @@
 import React from "react";
 import { multimedia } from "../../data/mockData";
 import "./media.css";
+import { useTranslation } from "react-i18next";
 
 // PUBLIC_INTERFACE
 export default function VideosPage() {
+  const { t } = useTranslation();
   return (
     <main className="page-offset">
       <div className="container">
-        <h2 className="section-title">Video Clips</h2>
+        <h2 className="section-title">{t("videos")}</h2>
         <div className="grid grid-3">
           {multimedia.videos.map((v) => (
             <a href="#" key={v.id} className="card shadow-card media-card">

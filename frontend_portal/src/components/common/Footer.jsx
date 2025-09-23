@@ -4,14 +4,17 @@
 // PUBLIC_INTERFACE
 import React from "react";
 import "./footer.css";
+import { useTranslation } from "../../react-i18next-shim";
 
 // PUBLIC_INTERFACE
 export default function Footer() {
+  const { t } = useTranslation();
+
   return (
     <footer className="gx-footer">
       <div className="container footer-top grid grid-3">
         <div>
-          <div className="footer-brand">GLOBAL EXPRESS</div>
+          <div className="footer-brand">{t("brand")}</div>
           <p className="footer-desc">
             Trusted, timely journalism powered by modern storytelling. © {new Date().getFullYear()}
           </p>
@@ -38,18 +41,18 @@ export default function Footer() {
 
         <div>
           <div className="footer-newsletter">
-            <h4>Get the Daily Briefing</h4>
-            <p>Stay informed with the top stories delivered to your inbox.</p>
+            <h4>{t("newsletter_title")}</h4>
+            <p>{t("newsletter_sub")}</p>
             <div className="newsletter-form">
-              <input className="input" placeholder="Your email address" />
-              <button className="btn btn-primary">Subscribe</button>
+              <input className="input" placeholder={t("newsletter_input")} />
+              <button className="btn btn-primary">{t("newsletter_cta")}</button>
             </div>
           </div>
         </div>
       </div>
       <div className="divider" />
       <div className="container footer-bottom">
-        <span>© {new Date().getFullYear()} GLOBAL EXPRESS</span>
+        <span>© {new Date().getFullYear()} {t("brand")}</span>
         <span>
           Made with <span role="img" aria-label="heart">❤️</span> for readers
         </span>

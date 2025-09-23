@@ -2,13 +2,15 @@
  * Featured News Carousel for top stories
  */
 // PUBLIC_INTERFACE
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { featuredStories } from "../../data/mockData";
 import "./featuredCarousel.css";
+import { LanguageContext } from "../../context/LanguageContext";
 
 // PUBLIC_INTERFACE
 export default function FeaturedCarousel() {
   const [index, setIndex] = useState(0);
+  const { lang } = useContext(LanguageContext);
   const next = () => setIndex((i) => (i + 1) % featuredStories.length);
   const prev = () => setIndex((i) => (i - 1 + featuredStories.length) % featuredStories.length);
 
@@ -28,14 +30,14 @@ export default function FeaturedCarousel() {
           key={s.id}
           aria-hidden={i !== index}
         >
-          <img src={s.image} alt={s.title} />
+          <img src={s.image} alt={typeof s.title === "string" ? s.title : (s.title?.[lang] ?? "")} />
           <div className="overlay">
             <span className="badge">{s.category}</span>
-            <h2 className="title">{s.title}</h2>
+            <h2 className="title">{s.title?.[lang] ?? s.title}</h2>
             <div className="meta">
-              <span>{s.author}</span>
+              <span>{s.author?.[lang] ?? s.author?.en ?? s.author}</span>
               <span>•</span>
-              <span>{s.timestamp}</span>
+              <span>{new Date(s.timestamp).toLocaleString()}</span>
             </div>
           </div>
         </a>

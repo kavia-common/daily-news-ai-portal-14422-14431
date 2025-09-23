@@ -2,8 +2,10 @@
  * Header with logo/title, date/time/location, search, and language switcher.
  */
 // PUBLIC_INTERFACE
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./header.css";
+import { LanguageContext } from "../../context/LanguageContext";
+import { useTranslation } from "react-i18next";
 
 function useClock() {
   const [now, setNow] = useState(new Date());
@@ -17,7 +19,8 @@ function useClock() {
 // PUBLIC_INTERFACE
 export default function Header() {
   const now = useClock();
-  const [lang, setLang] = useState("EN");
+  const { lang, setLang } = useContext(LanguageContext);
+  const { t } = useTranslation();
   const [query, setQuery] = useState("");
 
   const dateStr = now.toLocaleDateString(undefined, {
@@ -34,13 +37,13 @@ export default function Header() {
         <div className="brand">
           <div className="logo">GE</div>
           <div className="meta">
-            <div className="title">GLOBAL EXPRESS</div>
+            <div className="title">{t("brand")}</div>
             <div className="sub">
               <span>{dateStr}</span>
               <span className="dot">•</span>
               <span>{timeStr}</span>
               <span className="dot">•</span>
-              <span>Worldwide</span>
+              <span>{t("worldwide")}</span>
             </div>
           </div>
         </div>
@@ -51,7 +54,7 @@ export default function Header() {
               className="input"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search articles, topics, authors..."
+              placeholder={t("search_placeholder")}
               aria-label="Search"
             />
             <button className="btn" aria-label="Search">
@@ -59,18 +62,21 @@ export default function Header() {
             </button>
           </div>
           <div className="lang-switch">
-            <button
-              className={`btn ${lang === "EN" ? "active" : ""}`}
-              onClick={() => setLang("EN")}
-            >
-              EN
-            </button>
-            <button
-              className={`btn ${lang === "ES" ? "active" : ""}`}
-              onClick={() => setLang("ES")}
-            >
-              ES
-            </button>
+            {[
+              { code: "en", label: "EN" },
+              { code: "ta", label: "TA" },
+              { code: "te", label: "TE" },
+              { code: "kn", label: "KN" },
+              { code: "hi", label: "HI" }
+            ].map((l) => (
+              <button
+                key={l.code}
+                className={`btn ${lang === l.code ? "active" : ""}`}
+                onClick={() => setLang(l.code)}
+              >
+                {l.label}
+              </button>
+            ))}
           </div>
         </div>
       </div>

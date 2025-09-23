@@ -4,19 +4,21 @@
 // PUBLIC_INTERFACE
 import React from "react";
 import "./widget.css";
+import { useTranslation } from "react-i18next";
 
 // PUBLIC_INTERFACE
 export default function NewsletterBox() {
+  const { t } = useTranslation();
   return (
     <div className="widget card shadow-card">
       <div className="widget-header">
-        <span className="badge">Newsletter</span>
+        <span className="badge">{t("newsletter")}</span>
       </div>
       <div className="widget-body">
-        <p>Get the morning briefing and breaking alerts.</p>
+        <p>{t("newsletter_sub")}</p>
         <div className="newsletter-form">
-          <input className="input" placeholder="Your email address" />
-          <button className="btn btn-primary">Sign Up</button>
+          <input className="input" placeholder={t("newsletter_input")} />
+          <button className="btn btn-primary">{t("newsletter_cta")}</button>
         </div>
       </div>
     </div>
