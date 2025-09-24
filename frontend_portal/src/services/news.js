@@ -1,41 +1,44 @@
 //
+//
 // PUBLIC INTERFACE
-// News fetching helpers: India-focused defaults (English), headline normalization, and keyword search.
+// News fetching helpers: India-focused defaults (English) using open/public RSS feeds (no API keys).
 //
 
 /**
- * Normalize heterogeneous article payloads into a unified shape consumed by ArticleCard.
- * Ensures short, clear, prominent headline text and safe fallbacks for missing fields.
+ * PUBLIC_INTERFACE
+ * Normalize items into ArticleCard shape.
  */
 function normalizeArticles(arr = [], overrides = {}) {
   return (arr || [])
     .filter(Boolean)
     .map((a, idx) => {
-      const id = a.url || a.id || `news-${Date.now()}-${idx}`;
+      const id = a.url || a.link || a.guid || a.id || `news-${Date.now()}-${idx}`;
       const rawTitle = a.title || a.name || "Untitled";
-      // Keep headline short and readable: trim excessive suffixes and limit length
       const title = trimHeadline(rawTitle);
 
       const description =
         a.description ||
+        a.summary ||
         a.content ||
         a.excerpt ||
         "";
 
       const image =
-        a.urlToImage ||
         a.image ||
-        (a.media && (a.media.image || a.media.thumbnail)) ||
+        a.enclosure?.url ||
+        // Extract first <img src="..."> from content/summary if present
+        extractFirstImageFromHtml(a.content || a.summary || a.description) ||
         `https://picsum.photos/seed/in-${idx}/640/420`;
 
       const author =
-        (a.source && (a.source.name || a.source.id)) ||
+        a.creator ||
         a.author ||
+        (a.source && (a.source.name || a.source.id)) ||
         "Newswire";
 
       const publishedAt =
         a.publishedAt ||
-        a.date ||
+        a.pubDate ||
         a.published ||
         a.updated ||
         new Date().toISOString();
@@ -43,11 +46,12 @@ function normalizeArticles(arr = [], overrides = {}) {
       return {
         id,
         title,
-        excerpt: description,
+        excerpt: stripHtml(description).trim(),
         category: overrides.category || a.category || "General",
         author,
         timestamp: timeAgo(publishedAt),
         image,
+        url: a.url || a.link || a.guid || undefined
       };
     });
 }
@@ -67,6 +71,28 @@ function trimHeadline(text, maxLen = 110) {
 }
 
 /**
+ * Strip HTML tags for safe text previews.
+ */
+function stripHtml(html = "") {
+  if (typeof document !== "undefined") {
+    const el = document.createElement("div");
+    el.innerHTML = html;
+    return el.textContent || el.innerText || "";
+  }
+  // SSR-safe fallback
+  return html.replace(/<[^>]+>/g, " ");
+}
+
+/**
+ * Extract first image URL from an HTML string.
+ */
+function extractFirstImageFromHtml(html = "") {
+  if (!html) return null;
+  const match = html.match(/<img[^>]+src=["']([^"']+)["'][^>]*>/i);
+  return match ? match[1] : null;
+}
+
+/**
  * Format relative time for headlines, e.g., "2h ago".
  */
 function timeAgo(iso) {
@@ -82,82 +108,129 @@ function timeAgo(iso) {
 }
 
 /**
- * Build a NewsAPI endpoint for top-headlines with India defaults.
- * Note: Requires REACT_APP_NEWS_API_KEY in environment. No secret hardcoding.
+ * Lightweight RSS/Atom fetcher that uses no API keys.
+ * Attempts CORS-friendly public endpoints.
+ * Defaults to Times of India Top Stories in English.
  */
-function buildNewsApiTopHeadlinesUrl({ country = "in", category = "general", q = "", pageSize = 24 } = {}) {
-  const endpoint = new URL("https://newsapi.org/v2/top-headlines");
-  endpoint.searchParams.set("country", country);
-  // NewsAPI categories: business, entertainment, general, health, science, sports, technology
-  if (category) endpoint.searchParams.set("category", category);
-  if (q?.trim()) endpoint.searchParams.set("q", q.trim());
-  endpoint.searchParams.set("pageSize", String(pageSize));
-  return endpoint.toString();
+async function fetchRssFeedItems({ rssUrl }) {
+  const res = await fetch(rssUrl, {
+    // Rely on server providing CORS headers; many major RSS feeds include it.
+    // No-cors would hide body; avoid that to ensure we can parse XML.
+    method: "GET",
+  });
+  if (!res.ok) throw new Error(`RSS HTTP ${res.status}`);
+  const text = await res.text();
+
+  // Parse XML
+  const parser = new DOMParser();
+  const xml = parser.parseFromString(text, "application/xml");
+
+  // Detect parsing errors
+  const parserError = xml.querySelector("parsererror");
+  if (parserError) {
+    throw new Error("Failed to parse RSS XML.");
+  }
+
+  // Try RSS 2.0 <item>, then Atom <entry>
+  const items = Array.from(xml.querySelectorAll("channel > item")).map((n) => nodeToItem(n));
+  if (items.length) return items;
+
+  const entries = Array.from(xml.querySelectorAll("feed > entry")).map((n) => nodeToAtomItem(n));
+  return entries;
 }
 
 /**
- * Try NewsAPI first; optional GNews fallback if configured.
+ * Convert RSS <item> node to plain object.
  */
-async function fetchViaNewsProviders({ country = "in", category = "general", q = "", pageSize = 24 } = {}) {
-  const NEWS_KEY = process.env.REACT_APP_NEWS_API_KEY;
-  const GNEWS_KEY = process.env.REACT_APP_GNEWS_API_KEY;
+function nodeToItem(n) {
+  const get = (sel) => n.querySelector(sel)?.textContent || "";
+  const mediaContent = n.querySelector("enclosure")?.getAttribute("url") ||
+                       n.querySelector("media\\:content")?.getAttribute("url") ||
+                       n.querySelector("media\\:thumbnail")?.getAttribute("url");
+  const link = n.querySelector("link")?.textContent || n.querySelector("guid")?.textContent || "";
+  return {
+    title: get("title"),
+    link,
+    guid: get("guid"),
+    description: get("description"),
+    pubDate: get("pubDate"),
+    image: mediaContent || null,
+  };
+}
 
-  // Provider 1: NewsAPI
-  if (NEWS_KEY) {
+/**
+ * Convert Atom <entry> node to plain object.
+ */
+function nodeToAtomItem(n) {
+  const get = (sel) => n.querySelector(sel)?.textContent || "";
+  const linkEl = n.querySelector("link[rel='alternate']") || n.querySelector("link");
+  const link = linkEl?.getAttribute("href") || "";
+  return {
+    title: get("title"),
+    link,
+    guid: get("id"),
+    summary: get("summary"),
+    content: get("content"),
+    updated: get("updated") || get("published"),
+    image: null,
+  };
+}
+
+/**
+ * PUBLIC_INTERFACE
+ * Fetch latest India headlines in English from open/public RSS.
+ * Primary: Times of India Top Stories (English).
+ * Fallbacks: BBC India, The Hindu (if primary blocked).
+ */
+export async function fetchDefaultIndiaHeadlines() {
+  /** Fetch latest India headlines in English (RSS-based, no API key). */
+  const rssCandidates = [
+    // Times of India - Top Stories (English)
+    "https://timesofindia.indiatimes.com/rssfeeds/-2128936835.cms",
+    // BBC News - Asia (includes India coverage)
+    "http://feeds.bbci.co.uk/news/world/asia/india/rss.xml",
+    // The Hindu - National
+    "https://www.thehindu.com/news/national/feeder/default.rss",
+  ];
+
+  for (const url of rssCandidates) {
     try {
-      const url = buildNewsApiTopHeadlinesUrl({ country, category, q, pageSize });
-      const res = await fetch(url, { headers: { "X-Api-Key": NEWS_KEY } });
-      if (!res.ok) throw new Error(`NewsAPI HTTP ${res.status}`);
-      const data = await res.json();
-      if (data?.articles?.length) return normalizeArticles(data.articles, { category: "General" });
+      const raw = await fetchRssFeedItems({ rssUrl: url });
+      const normalized = normalizeArticles(raw, { category: "General" });
+      if (normalized?.length) return normalized.slice(0, 24);
     } catch (e) {
+      // continue to next candidate
       // eslint-disable-next-line no-console
-      console.warn("NewsAPI fallback due to:", e?.message);
+      console.warn("RSS fetch failed for", url, e?.message);
     }
   }
-
-  // Provider 2: GNews (English only for our UX)
-  if (GNEWS_KEY) {
-    try {
-      const endpoint = new URL("https://gnews.io/api/v4/top-headlines");
-      endpoint.searchParams.set("lang", "en");
-      endpoint.searchParams.set("country", "in");
-      if (q?.trim()) endpoint.searchParams.set("q", q.trim());
-      if (category) endpoint.searchParams.set("topic", category.toLowerCase() === "general" ? "breaking-news" : category.toLowerCase());
-      endpoint.searchParams.set("max", String(Math.min(pageSize, 50)));
-      endpoint.searchParams.set("apikey", GNEWS_KEY);
-
-      const res = await fetch(endpoint.toString());
-      if (!res.ok) throw new Error(`GNews HTTP ${res.status}`);
-      const data = await res.json();
-      if (data?.articles?.length) return normalizeArticles(data.articles, { category: "General" });
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.warn("GNews fallback failed:", e?.message);
-    }
-  }
-
   return [];
 }
 
-// PUBLIC_INTERFACE
-export async function fetchDefaultIndiaHeadlines() {
-  /** Fetch latest India headlines in English (category general, country=in). */
-  return fetchViaNewsProviders({ country: "in", category: "general", q: "", pageSize: 24 });
-}
-
-// PUBLIC_INTERFACE
+/**
+ * PUBLIC_INTERFACE
+ * Search India news by keyword via RSS: naive approach filters fetched feed items.
+ * Since RSS is not a search API, we perform client-side match on title/summary.
+ */
 export async function searchIndiaNewsByKeyword(keyword) {
-  /** Fetch India news in English filtered by the given keyword. */
-  const q = (keyword || "").trim();
-  return fetchViaNewsProviders({ country: "in", category: "general", q, pageSize: 24 });
+  /** Fetch India news in English filtered by keyword (client-side match). */
+  const q = (keyword || "").trim().toLowerCase();
+  const all = await fetchDefaultIndiaHeadlines();
+  if (!q) return all;
+  return all.filter((a) => {
+    const t = (a.title || "").toLowerCase();
+    const e = (a.excerpt || "").toLowerCase();
+    return t.includes(q) || e.includes(q);
+  });
 }
 
-// PUBLIC_INTERFACE
+/**
+ * PUBLIC_INTERFACE
+ * Creates a succinct location string from coordinates.
+ */
 export function getReadableLocationString(coords) {
   /** Creates a succinct location string from coordinates. */
   if (!coords) return "Locating…";
   const { latitude, longitude } = coords;
-  // Keep precise yet short for display
   return `Your location: ${latitude.toFixed(3)}, ${longitude.toFixed(3)}`;
 }

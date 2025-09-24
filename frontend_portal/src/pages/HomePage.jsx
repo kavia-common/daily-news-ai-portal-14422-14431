@@ -1,4 +1,4 @@
- /** 
+ /**
   * HomePage layout combining main modules.
   */
  // PUBLIC_INTERFACE
@@ -74,7 +74,7 @@
              {loading && <p>Loading top headlines…</p>}
              {!loading && errorText && <p style={{ color: "var(--ocean-error)" }}>{errorText}</p>}
              {!loading && !errorText && !hasResults && (
-               <p>No results right now. Try another keyword.</p>
+               <p>No results right now. Please refresh or try a different keyword.</p>
              )}
              <div className="grid grid-3">
                {items.map((a) => (
