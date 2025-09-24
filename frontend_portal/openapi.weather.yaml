@@ -1,0 +1,307 @@
+openapi: 3.0.3
+info:
+  title: Frontend Portal Weather API
+  description: >
+    Simple REST API to fetch current weather for the user's current location or any provided geographic coordinates.
+
+    This endpoint is designed to power the Weather widget in the portal and similar UI surfaces.
+
+    Usage:
+    - GET /weather?lat=<latitude>&lon=<longitude>
+    - POST /weather with JSON body { "lat": <latitude>, "lon": <longitude> }
+
+    Notes:
+    - The API expects decimal degrees (WGS84) for latitude and longitude.
+    - Intended for "current location" use where the client retrieves device coordinates (with permission) and calls this API.
+  version: "1.0.0"
+servers:
+  - url: https://api.example.com
+    description: Production server (replace with actual API host)
+  - url: http://localhost:3000
+    description: Local development (proxy or mock)
+tags:
+  - name: Weather
+    description: Endpoints to retrieve current weather data for a given location.
+paths:
+  /weather:
+    get:
+      tags: [Weather]
+      summary: Get current weather by coordinates
+      description: >
+        Returns the current weather conditions for the given coordinates.
+
+        This method is appropriate when the client already has the user's current location (e.g., via the browser Geolocation API)
+        and wants to retrieve current weather for that location.
+      operationId: getWeather
+      parameters:
+        - in: query
+          name: lat
+          required: true
+          schema:
+            type: number
+            format: float
+            minimum: -90
+            maximum: 90
+          description: Latitude in decimal degrees (WGS84).
+        - in: query
+          name: lon
+          required: true
+          schema:
+            type: number
+            format: float
+            minimum: -180
+            maximum: 180
+          description: Longitude in decimal degrees (WGS84).
+        - in: query
+          name: units
+          required: false
+          schema:
+            type: string
+            enum: [standard, metric, imperial]
+            default: metric
+          description: Units for temperature and wind (metric = Celsius, m/s; imperial = Fahrenheit, mph).
+      responses:
+        "200":
+          description: Current weather data retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WeatherResponse"
+              examples:
+                success:
+                  summary: Example weather response (metric)
+                  value:
+                    coord: { lon: -0.1276, lat: 51.5072 }
+                    weather:
+                      - id: 803
+                        main: Clouds
+                        description: broken clouds
+                        icon: 04d
+                    base: stations
+                    main:
+                      temp: 18.4
+                      feels_like: 17.6
+                      temp_min: 17.0
+                      temp_max: 20.1
+                      pressure: 1012
+                      humidity: 63
+                    visibility: 10000
+                    wind:
+                      speed: 3.6
+                      deg: 240
+                    clouds:
+                      all: 75
+                    dt: 1716475000
+                    sys:
+                      country: GB
+                      sunrise: 1716439800
+                      sunset: 1716496200
+                    timezone: 3600
+                    id: 2643743
+                    name: London
+                    cod: 200
+        "400":
+          description: Invalid request (e.g., missing or out-of-range coordinates).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                missing:
+                  value:
+                    error: "Bad Request"
+                    message: "lat and lon are required"
+                range:
+                  value:
+                    error: "Bad Request"
+                    message: "lat must be between -90 and 90; lon between -180 and 180"
+        "500":
+          description: Server error retrieving weather data from provider.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                provider_error:
+                  value:
+                    error: "Internal Server Error"
+                    message: "Upstream weather provider is unavailable"
+    post:
+      tags: [Weather]
+      summary: Post coordinates to get current weather
+      description: >
+        Accepts a JSON body with latitude and longitude and returns the current weather conditions.
+
+        This method is appropriate for clients that prefer sending coordinates in the request body (e.g., to avoid URL logging of query parameters).
+      operationId: postWeather
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WeatherRequest"
+            examples:
+              bodyExample:
+                value:
+                  lat: 37.7749
+                  lon: -122.4194
+                  units: metric
+      responses:
+        "200":
+          description: Current weather data retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WeatherResponse"
+              examples:
+                success:
+                  summary: Example weather response (imperial)
+                  value:
+                    coord: { lon: -122.4194, lat: 37.7749 }
+                    weather:
+                      - id: 800
+                        main: Clear
+                        description: clear sky
+                        icon: 01d
+                    base: stations
+                    main:
+                      temp: 66.2
+                      feels_like: 65.5
+                      temp_min: 62.6
+                      temp_max: 69.8
+                      pressure: 1016
+                      humidity: 55
+                    visibility: 10000
+                    wind:
+                      speed: 6.9
+                      deg: 300
+                    clouds:
+                      all: 0
+                    dt: 1716475200
+                    sys:
+                      country: US
+                      sunrise: 1716451200
+                      sunset: 1716502800
+                    timezone: -25200
+                    id: 5391959
+                    name: San Francisco
+                    cod: 200
+        "400":
+          description: Invalid request (e.g., malformed JSON, missing fields, or out-of-range values).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                malformed:
+                  value:
+                    error: "Bad Request"
+                    message: "Invalid JSON payload"
+        "500":
+          description: Server error retrieving weather data from provider.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+components:
+  schemas:
+    WeatherRequest:
+      type: object
+      required: [lat, lon]
+      properties:
+        lat:
+          type: number
+          format: float
+          minimum: -90
+          maximum: 90
+          description: Latitude in decimal degrees (WGS84).
+        lon:
+          type: number
+          format: float
+          minimum: -180
+          maximum: 180
+          description: Longitude in decimal degrees (WGS84).
+        units:
+          type: string
+          enum: [standard, metric, imperial]
+          default: metric
+          description: Units for temperature and wind (metric = Celsius, m/s; imperial = Fahrenheit, mph).
+      description: >
+        Coordinates and optional units to retrieve current weather, typically obtained from the user's device for current location weather.
+    WeatherResponse:
+      type: object
+      description: >
+        Weather payload modeled after common providers (e.g., OpenWeatherMap).
+        Fields included support the portal's Weather widget (temperature, conditions, icon, wind, humidity, location name).
+      properties:
+        coord:
+          type: object
+          properties:
+            lon: { type: number }
+            lat: { type: number }
+        weather:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: integer, description: Provider condition code }
+              main: { type: string, description: Group of weather parameters (e.g. Rain, Snow) }
+              description: { type: string, description: Weather condition within the group }
+              icon: { type: string, description: Icon code usable with the provider's icon set }
+        base:
+          type: string
+          nullable: true
+        main:
+          type: object
+          properties:
+            temp: { type: number, description: Current temperature }
+            feels_like: { type: number }
+            temp_min: { type: number }
+            temp_max: { type: number }
+            pressure: { type: number }
+            humidity: { type: number }
+        visibility: { type: integer, nullable: true }
+        wind:
+          type: object
+          properties:
+            speed: { type: number, description: Wind speed (unit depends on 'units' param) }
+            deg: { type: number, description: Wind direction in degrees }
+        clouds:
+          type: object
+          properties:
+            all: { type: integer, description: Cloudiness, % }
+        dt:
+          type: integer
+          description: Time of data calculation (Unix UTC)
+        sys:
+          type: object
+          properties:
+            country: { type: string, description: Two-letter country code }
+            sunrise: { type: integer }
+            sunset: { type: integer }
+        timezone:
+          type: integer
+          description: Shift in seconds from UTC
+        id:
+          type: integer
+          description: City ID
+        name:
+          type: string
+          description: City or area name resolved by the provider
+        cod:
+          type: integer
+          description: HTTP-like status code from the provider
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error short title
+          example: Bad Request
+        message:
+          type: string
+          description: Human-readable error details
+          example: lat and lon are required
+externalDocs:
+  description: OpenWeatherMap current weather API (reference shape)
+  url: https://openweathermap.org/current
