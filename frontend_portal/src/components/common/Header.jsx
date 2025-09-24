@@ -4,6 +4,7 @@
 // PUBLIC_INTERFACE
 import React, { useEffect, useState } from "react";
 import "./header.css";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 function useClock() {
   const [now, setNow] = useState(new Date());
@@ -19,6 +20,14 @@ export default function Header() {
   const now = useClock();
   const [lang, setLang] = useState("EN");
   const [query, setQuery] = useState("");
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    // keep header input in sync with current q param
+    const q = searchParams.get("q") || "";
+    setQuery(q);
+  }, [searchParams]);
 
   const dateStr = now.toLocaleDateString(undefined, {
     weekday: "long",
@@ -27,6 +36,18 @@ export default function Header() {
     day: "numeric",
   });
   const timeStr = now.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+
+  const performSearch = () => {
+    const cat = searchParams.get("cat"); // preserve category if any
+    const next = new URLSearchParams();
+    if (cat) next.set("cat", cat);
+    if (query?.trim()) next.set("q", query.trim());
+    navigate({ pathname: "/", search: `?${next.toString()}` });
+  };
+
+  const onKeyDown = (e) => {
+    if (e.key === "Enter") performSearch();
+  };
 
   return (
     <header className="gx-header">
@@ -51,10 +72,11 @@ export default function Header() {
               className="input"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={onKeyDown}
               placeholder="Search articles, topics, authors..."
               aria-label="Search"
             />
-            <button className="btn" aria-label="Search">
+            <button className="btn" aria-label="Search" onClick={performSearch}>
               🔍
             </button>
           </div>
