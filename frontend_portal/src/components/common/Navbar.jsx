@@ -10,8 +10,7 @@ import { useNavigate } from "react-router-dom";
 
 /**
  * PUBLIC_INTERFACE
- * Navbar exposes navigation to categories. Selecting "Politics" triggers a Home feed filter via query param (?cat=Politics)
- * which HomePage reads to fetch live political news. Other categories leave current mocked behavior intact.
+ * Navbar exposes navigation to categories. Click navigates to Home preserving UX; future wiring can map categories to queries.
  */
 export default function Navbar() {
   const [openIdx, setOpenIdx] = useState(null);
@@ -19,12 +18,7 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   const onCategoryClick = (name) => {
-    if (name === "Politics") {
-      // Navigate to home with category param. HomePage will fetch politics.
-      navigate({ pathname: "/", search: "?cat=Politics" });
-      return;
-    }
-    // Default navigate to home with local filter category (for future extension)
+    // Navigate to home with category param (placeholder for future category feeds)
     navigate({ pathname: "/", search: `?cat=${encodeURIComponent(name)}` });
   };
 

@@ -61,7 +61,8 @@
   gap: 8px;
 }
 .search .input {
-  width: min(380px, 48vw);
+  width: min(420px, 56vw);
+  font-size: 16px;
 }
 
 .lang-switch {
